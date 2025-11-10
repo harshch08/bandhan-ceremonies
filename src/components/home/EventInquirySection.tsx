@@ -50,6 +50,7 @@ type InquiryFormData = z.infer<typeof inquirySchema>;
 
 const EventInquirySection = () => {
   const { toast } = useToast();
+  const [expandedCard, setExpandedCard] = useState<string | null>(null);
   const [forms, setForms] = useState<Record<string, Partial<InquiryFormData>>>({
     school: {},
     college: {},
@@ -127,12 +128,14 @@ ${validatedData.message ? `*Message:* ${validatedData.message}` : ""}`;
           {eventCategories.map((category, index) => {
             const Icon = category.icon;
             const formData = forms[category.id] || {};
+            const isExpanded = expandedCard === category.id;
 
             return (
               <Card
                 key={category.id}
-                className="border-accent/20 bg-card/80 backdrop-blur-sm shadow-soft hover:shadow-elegant transition-all duration-300 hover:-translate-y-1 animate-fade-in"
+                className="border-accent/20 bg-card/80 backdrop-blur-sm shadow-soft hover:shadow-elegant transition-all duration-300 hover:-translate-y-1 animate-fade-in cursor-pointer"
                 style={{ animationDelay: `${index * 100}ms` }}
+                onClick={() => !isExpanded && setExpandedCard(category.id)}
               >
                 <CardHeader className="text-center pb-4">
                   <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-accent/10 flex items-center justify-center">
@@ -144,9 +147,13 @@ ${validatedData.message ? `*Message:* ${validatedData.message}` : ""}`;
                   <CardDescription className="text-sm text-muted-foreground">
                     {category.description}
                   </CardDescription>
+                  {!isExpanded && (
+                    <p className="text-xs text-accent mt-2 font-medium">Click to inquire</p>
+                  )}
                 </CardHeader>
 
-                <CardContent className="space-y-4">
+                {isExpanded && (
+                  <CardContent className="space-y-4" onClick={(e) => e.stopPropagation()}>
                   <div className="space-y-2">
                     <Label htmlFor={`${category.id}-name`} className="text-sm font-medium">
                       Name
@@ -248,13 +255,23 @@ ${validatedData.message ? `*Message:* ${validatedData.message}` : ""}`;
                     />
                   </div>
 
-                  <Button
-                    onClick={() => handleSubmit(category.id, category.title)}
-                    className="w-full bg-accent text-accent-foreground hover:bg-accent/90 font-medium"
-                  >
-                    Submit Inquiry
-                  </Button>
-                </CardContent>
+                    <div className="flex gap-2">
+                      <Button
+                        onClick={() => setExpandedCard(null)}
+                        variant="outline"
+                        className="flex-1"
+                      >
+                        Cancel
+                      </Button>
+                      <Button
+                        onClick={() => handleSubmit(category.id, category.title)}
+                        className="flex-1 bg-accent text-accent-foreground hover:bg-accent/90 font-medium"
+                      >
+                        Submit Inquiry
+                      </Button>
+                    </div>
+                  </CardContent>
+                )}
               </Card>
             );
           })}

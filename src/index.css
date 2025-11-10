@@ -137,4 +137,8 @@ All colors MUST be HSL.
     content: '';
     @apply absolute bottom-0 right-0 w-32 h-32 bg-accent/5 rounded-full blur-3xl;
   }
+
+  .pause-animation {
+    animation-play-state: paused !important;
+  }
 }
